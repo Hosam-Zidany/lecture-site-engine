@@ -3,7 +3,7 @@
  */
 export const GUIDE_CONFIG = {
   storagePrefix: 'computer-architecture',
-  defaultTitle: 'computer-architecture',
+  defaultTitle: 'بنيان الحواسيب',
   homeHeaderBrand: 'فريق TTM الأكاديمي',
   defaultSubtitle: 'دليل دراسي تفاعلي',
 

@@ -17,7 +17,7 @@ import {
 
 const ENGINE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ENGINE_ROOT, 'dist');
-
+const IS_DEV = process.env.GITHUB_BRANCH === 'dev';
 /** @type {Record<string, { primary: string, secondary: string, tertiary: string, fixed: string, onFixed: string, icon: string }>} */
 const HUB_THEME_PALETTE = {
   'kotlin-pink-blue': {
@@ -48,11 +48,11 @@ const HUB_THEME_PALETTE = {
 
 /** @type {Record<number, { primary: string, secondary: string, fixed: string, label: string }>} */
 const YEAR_ACCENTS = {
-  1: { primary: '#7c3aed', secondary: '#a78bfa', fixed: '#ede9fe', label: 'الأولى' },
-  2: { primary: '#2563eb', secondary: '#60a5fa', fixed: '#dbeafe', label: 'الثانية' },
-  3: { primary: '#059669', secondary: '#34d399', fixed: '#d1fae5', label: 'الثالثة' },
+  1: { primary: '#d97706', secondary: '#fbbf24', fixed: '#fef3c7', label: 'الأولى' },
+  2: { primary: '#d97706', secondary: '#fbbf24', fixed: '#fef3c7', label: 'الثانية' },
+  3: { primary: '#d97706', secondary: '#fbbf24', fixed: '#fef3c7', label: 'الثالثة' },
   4: { primary: '#d97706', secondary: '#fbbf24', fixed: '#fef3c7', label: 'الرابعة' },
-  5: { primary: '#be123c', secondary: '#fb7185', fixed: '#ffe4e6', label: 'الخامسة' },
+  5: { primary: '#d97706', secondary: '#fbbf24', fixed: '#fef3c7', label: 'الخامسة' },
 };
 
 /** @param {number} n */
@@ -121,7 +121,7 @@ async function collectHubSubjects() {
 
     let theme = inferTheme(subjectId, domain);
     let matIcon = HUB_THEME_PALETTE[theme]?.icon || 'school';
-
+    let enabledLectures = false;
     const manifestSrc = path.join(lecturesDir, 'manifest.json');
     if (existsSync(manifestSrc)) {
       try {
@@ -129,6 +129,7 @@ async function collectHubSubjects() {
         title = m.settings?.subjectName || m.title || title;
         subtitle = m.subtitle || subtitle;
         year = m.settings?.year || '';
+        enabledLectures = m.settings?.enabledLectures || false;
         academicYear = m.settings?.academicYear ?? academicYear;
         theme = m.settings?.theme || theme;
         matIcon = m.lectureMatIcons?.[0]
@@ -141,9 +142,12 @@ async function collectHubSubjects() {
     const lectureCount = await countLecturesForSubject(rel);
     const hasLectures = lectureCount > 0;
 
-    items.push({
+    if(enabledLectures)
+    {
+      items.push({
       rel, title, subtitle, year, academicYear, hasLectures, lectureCount, theme, matIcon,
     });
+    }
   }
 
   return items.sort((a, b) => a.rel.localeCompare(b.rel, 'ar'));

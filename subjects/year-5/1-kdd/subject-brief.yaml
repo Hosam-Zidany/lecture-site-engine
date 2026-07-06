@@ -2,10 +2,10 @@ schema_version: "1.0"
 
 subject:
   id: kdd
-  name_ar: "اكتشاف المعرفة في قواعد البيانات"
-  name_en: "Knowledge Discovery in Databases"
+  name_ar: "قواعد معرفية"
+  name_en: "Knowledge Discovery in Databases (KDD)"
   tagline: "تنقيب + تصنيف + تجميع + تنبؤ"
-  section_label: "القسم العملي"
+  section_label: "تصميم"
 
 locale:
   language: ar

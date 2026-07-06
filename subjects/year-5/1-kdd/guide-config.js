@@ -3,7 +3,7 @@
  */
 export const GUIDE_CONFIG = {
   storagePrefix: 'kdd',
-  defaultTitle: 'اكتشاف المعرفة في قواعد البيانات',
+  defaultTitle: 'قواعد معرفية',
   homeHeaderBrand: 'فريق TTM الأكاديمي',
   defaultSubtitle: 'تنقيب + تصنيف + تجميع + تنبؤ',
 

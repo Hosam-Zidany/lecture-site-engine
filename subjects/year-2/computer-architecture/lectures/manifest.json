@@ -1,13 +1,13 @@
 {
   "settings": {
-    "subjectName": "computer-architecture",
+    "subjectName": "بنيان الحواسيب",
     "subjectNameEn": "computer-architecture",
     "year": "2025-2026",
     "academicYear": 2,
     "theme": "amber-default",
     "department": "القسم"
   },
-  "title": "computer-architecture — computer-architecture",
+  "title": "بنيان الحواسيب — Computer Architecture",
   "subtitle": "دليل دراسي تفاعلي",
   "files": [],
   "lectureIcons": [

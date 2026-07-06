@@ -4,7 +4,8 @@
     "subjectNameEn": "Numerical Analysis 1",
     "year": "2025-2026",
     "academicYear": 1,
-    "theme": "amber-default",
+    "theme": "gis-earth",
+    "enabledLectures": true,
     "department": "القسم النظري"
   },
   "title": "التحليل العددي 1 — Numerical Analysis 1",

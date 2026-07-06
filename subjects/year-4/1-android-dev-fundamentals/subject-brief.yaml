@@ -6,7 +6,7 @@ schema_version: "1.0"
 # ─── Subject identity ─────────────────────────────────────────────────────────
 subject:
   id: android-dev-fundamentals
-  name_ar: "أساسيات تطوير تطبيقات أندرويد (النظري الكامل)"
+  name_ar: " 2 - اللغة الانجليزية التخصصية"
   name_en: "Android Development Fundamentals (Full Theory)"
   tagline: "منصة أندرويد كوتلن Compose"  # 4-word summary
   section_label: "نظري"
