@@ -80,7 +80,6 @@ export function applySiteSettings(manifest, options = {}) {
 
   const homeTitle = document.getElementById('homeTitle');
   const homeSubtitle = document.getElementById('homeSubtitle');
-  const heroSub = document.getElementById('heroSub');
   const appBrand = document.getElementById('appBrand');
   const appBrandShort = document.getElementById('appBrandShort');
   const siteYear = document.getElementById('siteYear');
@@ -94,7 +93,6 @@ export function applySiteSettings(manifest, options = {}) {
 
   if (homeTitle) homeTitle.textContent = subjectName || manifest.title || '';
   if (homeSubtitle) homeSubtitle.textContent = subtitle;
-  if (heroSub) heroSub.textContent = subtitle;
   if (appBrand) appBrand.textContent = headerBrand;
   if (appBrandShort) appBrandShort.textContent = headerBrandShort || 'موقع تفاعلي';
   if (siteYear) siteYear.textContent = year;
