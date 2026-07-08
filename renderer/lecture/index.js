@@ -150,11 +150,13 @@ export function renderLecture(lecture, accent, icon, refs, deps) {
     html += `</div>`;
   }
 
-  const mcqPartIdx = lecture.parts.findIndex(p => p.type === 'mcq');
-  if (mcqPartIdx >= 0) {
+  const summaryPartIdx = lecture.parts.findIndex(p =>
+    p.type === 'summary' && !/checklist|قائمة فحص|قائمة المراجعة/i.test(p.title || ''),
+  );
+  if (summaryPartIdx >= 0) {
     html += `<div class="lg:hidden flex justify-center mb-md">
-      <button type="button" data-jump-quiz class="inline-flex items-center gap-sm px-lg py-md bg-primary text-on-primary rounded-full font-label-md font-bold hover:opacity-90 transition-opacity">
-        ${ms('quiz', false, 'text-lg')} ابدأ الاختبار
+      <button type="button" data-jump-summary class="inline-flex items-center gap-sm px-lg py-md bg-primary text-on-primary rounded-full font-label-md font-bold hover:opacity-90 transition-opacity">
+        ${ms('summarize', false, 'text-lg')} الملخص المنظم
       </button>
     </div>`;
   }

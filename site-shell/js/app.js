@@ -14,12 +14,12 @@ const STORAGE_THEME = `${GUIDE_CONFIG.storagePrefix || 'study-guide'}-theme`;
 const STORAGE_LAST_LECTURE = `${GUIDE_CONFIG.storagePrefix || 'study-guide'}-last-lecture`;
 const STORAGE_LECTURE_WIDTH = `${GUIDE_CONFIG.storagePrefix || 'study-guide'}-lecture-width`;
 const LECTURE_WIDTH_OPTIONS = [
-  { value: '50', label: '50%' },
-  { value: '70', label: '70%' },
-  { value: '100', label: '100%' },
-  { value: '120', label: '120%' },
-  { value: '150', label: '150%' },
-  { value: 'fill', label: 'ملء' },
+  { value: '50', label: '50%', body: '50%' },
+  { value: '70', label: '70%', body: '70%' },
+  { value: '100', label: '100%', body: '100%' },
+  { value: '120', label: '120%', body: '100%', padInline: 'var(--lecture-pad-md)', mainMax: 'min(100%, 75rem)' },
+  { value: '150', label: '150%', body: '100%', padInline: 'var(--lecture-pad-sm)', mainMax: 'none' },
+  { value: 'fill', label: 'ملء', expand: true },
 ];
 const DEFAULT_LECTURE_WIDTH = '50';
 
@@ -164,6 +164,11 @@ function revealAnimated(el) {
   targets.forEach(node => node.classList.add('is-visible'));
 }
 
+function revealSectionTree(section) {
+  if (!section) return;
+  revealAnimated(section);
+}
+
 function scrollToAnchor(anchorHash, attempt = 0) {
   if (!anchorHash) return;
   const id = anchorIdFromHash(anchorHash);
@@ -180,13 +185,29 @@ function scrollToAnchor(anchorHash, attempt = 0) {
     setTimeout(() => el.classList.remove('anchor-flash'), 2200);
 }
 
+function revealLectureDetailSections(root = document.getElementById('content')) {
+  if (!root) return;
+  root.querySelectorAll('.section-block[data-part-type="detail"]').forEach(revealSectionTree);
+}
+
 function scrollAfterLectureLoad(hashPart, item) {
   const scroll = () => {
     if (hashPointsToSection(hashPart, item)) scrollToAnchor(hashPart);
-    else window.scrollTo({ top: 0, behavior: "smooth" });
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
+    revealLectureDetailSections();
+    refreshLectureVisibility();
   };
-  // Wait for layout after innerHTML, diagrams, KaTeX, and hljs.
   requestAnimationFrame(() => requestAnimationFrame(scroll));
+}
+
+function refreshLectureVisibility(root = document.getElementById('content')) {
+  if (!root) return;
+  root.querySelectorAll('.section-block').forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 1.05 && rect.bottom > 0) {
+      revealSectionTree(sec);
+    }
+  });
 }
 
 function setActiveNavLink(activeEl) {
@@ -299,7 +320,7 @@ function initScrollAnimations(root = document) {
   scrollAnimObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
+        revealSectionTree(entry.target);
         scrollAnimObserver?.unobserve(entry.target);
       }
     });
@@ -308,7 +329,7 @@ function initScrollAnimations(root = document) {
   const reveal = el => {
     const rect = el.getBoundingClientRect();
     if (rect.top < window.innerHeight * 1.1) {
-      el.classList.add('is-visible');
+      revealSectionTree(el);
     } else {
       scrollAnimObserver.observe(el);
     }
@@ -318,7 +339,11 @@ function initScrollAnimations(root = document) {
     sec.classList.remove('is-visible');
     sec.classList.remove('stagger-1', 'stagger-2', 'stagger-3', 'stagger-4', 'stagger-5', 'stagger-6');
     sec.classList.add(`stagger-${(i % 6) + 1}`);
-    reveal(sec);
+    if (sec.dataset.partType === 'detail') {
+      revealSectionTree(sec);
+    } else {
+      reveal(sec);
+    }
   });
 
   root.querySelectorAll('.box-animate').forEach(el => {
@@ -326,6 +351,8 @@ function initScrollAnimations(root = document) {
     el.classList.remove('is-visible');
     reveal(el);
   });
+
+  root.querySelectorAll('.lecture-body .section-block').forEach(revealSectionTree);
 }
 
 function loadLectureView(idx, hashPart) {
@@ -356,6 +383,11 @@ function loadLectureView(idx, hashPart) {
     if (window.hljs) document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
     buildSidebar(item.toc);
     initScrollAnimations(document.getElementById('content'));
+    revealLectureDetailSections(document.getElementById('content'));
+    requestAnimationFrame(() => {
+      revealLectureDetailSections(document.getElementById('content'));
+      refreshLectureVisibility(document.getElementById('content'));
+    });
   } else {
     buildSidebar(item.toc);
   }
@@ -370,19 +402,34 @@ function loadLectureView(idx, hashPart) {
     else window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function jumpToQuiz() {
+function jumpToSummary() {
   const item = appState.items[currentLectureIndex];
   if (!item) return;
-  const quiz = item.toc?.parts?.find(p => /mcq|اختبار/i.test(p.title));
-  if (quiz) location.hash = quiz.id;
-  else document.getElementById('content')?.querySelector('.mcq-part')?.scrollIntoView({ behavior: 'smooth' });
+  const part = item.toc?.parts?.find(p =>
+    p.type === 'summary' && !/checklist|قائمة فحص|قائمة المراجعة/i.test(p.title),
+  ) || item.toc?.parts?.find(p => p.type === 'summary' && /ملخص/i.test(p.title));
+  if (!part) return;
+  const hash = `#${part.id}`;
+  if (location.hash === hash) scrollToAnchor(part.id);
+  else location.hash = part.id;
   closeMobileToc();
 }
 
-function initJumpQuiz() {
-  document.getElementById('jumpQuizBtn')?.addEventListener('click', jumpToQuiz);
-  document.getElementById('mobileJumpQuizBtn')?.addEventListener('click', jumpToQuiz);
-  document.getElementById('mobileStudyQuizBtn')?.addEventListener('click', jumpToQuiz);
+function initJumpSummary() {
+  document.getElementById('jumpQuizBtn')?.addEventListener('click', jumpToSummary);
+  document.getElementById('mobileJumpQuizBtn')?.addEventListener('click', jumpToSummary);
+  document.getElementById('mobileStudyQuizBtn')?.addEventListener('click', jumpToSummary);
+}
+
+function bindJumpSummaryClicks() {
+  document.getElementById('content')?.addEventListener('click', onJumpSummaryClick);
+}
+
+function onJumpSummaryClick(e) {
+  if (e.target.closest('[data-jump-summary]')) {
+    e.preventDefault();
+    jumpToSummary();
+  }
 }
 
 function normalizeLectureWidth(value) {
@@ -406,12 +453,22 @@ function applyLectureWidth(width) {
   const mode = normalizeLectureWidth(width);
   const view = document.getElementById('lectureView');
   const btn = document.getElementById('lectureWidthBtn');
+  const preset = LECTURE_WIDTH_OPTIONS.find(opt => opt.value === mode);
+
   view?.setAttribute('data-width', mode);
-  if (mode === 'fill') {
+
+  if (preset?.expand) {
     view?.style.removeProperty('--lecture-body-width');
-  } else {
-    view?.style.setProperty('--lecture-body-width', `${mode}%`);
+    view?.style.setProperty('--lecture-main-pad-inline', 'var(--lecture-pad-xs)');
+    view?.style.setProperty('--lecture-main-pad-block', 'var(--lecture-pad-sm)');
+    view?.style.setProperty('--lecture-main-max-width', 'none');
+  } else if (preset) {
+    view?.style.setProperty('--lecture-body-width', preset.body);
+    view?.style.setProperty('--lecture-main-pad-inline', preset.padInline || 'var(--lecture-pad-default)');
+    view?.style.setProperty('--lecture-main-pad-block', preset.padBlock || 'var(--lecture-pad-default)');
+    view?.style.setProperty('--lecture-main-max-width', preset.mainMax || 'var(--lecture-main-max-default)');
   }
+
   btn?.setAttribute('title', `عرض المحتوى: ${lectureWidthLabel(mode)}`);
   document.querySelectorAll('.lecture-width-menu__item').forEach(item => {
     item.classList.toggle('is-active', item.dataset.width === mode);
@@ -511,7 +568,8 @@ async function init() {
   initTheme();
   initInteractivity();
   initScrollFab();
-  initJumpQuiz();
+  initJumpSummary();
+  bindJumpSummaryClicks();
   initLectureWidthToggle();
   initMobileStudyUi();
   document.getElementById('backToHomeBtn')?.addEventListener('click', () => {
