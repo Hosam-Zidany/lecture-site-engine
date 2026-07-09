@@ -16,10 +16,12 @@ import {
   trackLectureContentReady,
   updateAnalyticsContext,
 } from './analytics.js';
+import { initLaserPointer } from './laser-pointer.js';
 
 const STORAGE_THEME = `${GUIDE_CONFIG.storagePrefix || 'study-guide'}-theme`;
 const STORAGE_LAST_LECTURE = `${GUIDE_CONFIG.storagePrefix || 'study-guide'}-last-lecture`;
 const STORAGE_LECTURE_WIDTH = `${GUIDE_CONFIG.storagePrefix || 'study-guide'}-lecture-width`;
+const STORAGE_NOTES_PREFIX = `${GUIDE_CONFIG.storagePrefix || 'study-guide'}-notes`;
 const LECTURE_WIDTH_OPTIONS = [
   { value: '50', label: '50%', body: '50%' },
   { value: '70', label: '70%', body: '70%' },
@@ -155,6 +157,7 @@ function showView(name) {
   document.getElementById('backToHomeBtn')?.classList.toggle('hidden', name === 'home');
   document.getElementById('backToHubBtn')?.classList.toggle('hidden', name !== 'home');
   document.getElementById('lectureWidthControl')?.classList.toggle('hidden', name !== 'lecture');
+  document.getElementById('lectureNotesBtn')?.classList.toggle('hidden', name !== 'lecture');
   document.getElementById('mobileStudyBar')?.classList.toggle('hidden', name !== 'lecture');
   document.documentElement.classList.toggle('is-lecture-view', name === 'lecture');
   const brandBtn = document.getElementById('brandBtn');
@@ -580,6 +583,7 @@ async function loadLectureView(idx, hashPart) {
 
   trackLectureView(item);
   if (!needsRender) trackLectureContentReady();
+  loadLectureNotes();
 }
 
 function jumpToSummary() {
@@ -732,6 +736,74 @@ function initMobileStudyUi() {
   });
 }
 
+function lectureNotesStorageKey() {
+  const hash = anchorIdFromHash(location.hash) || 'home';
+  return `${STORAGE_NOTES_PREFIX}:${location.pathname}#${hash}`;
+}
+
+function loadLectureNotes() {
+  const textarea = document.getElementById('lectureNotesInput');
+  if (!textarea) return;
+  try {
+    textarea.value = localStorage.getItem(lectureNotesStorageKey()) || '';
+  } catch {
+    textarea.value = '';
+  }
+}
+
+function saveLectureNotes() {
+  const textarea = document.getElementById('lectureNotesInput');
+  if (!textarea) return;
+  try {
+    localStorage.setItem(lectureNotesStorageKey(), textarea.value);
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
+function openLectureNotesModal() {
+  const modal = document.getElementById('lectureNotesModal');
+  const textarea = document.getElementById('lectureNotesInput');
+  if (!modal || !textarea) return;
+  loadLectureNotes();
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  textarea.focus();
+}
+
+function closeLectureNotesModal() {
+  const modal = document.getElementById('lectureNotesModal');
+  if (!modal) return;
+  saveLectureNotes();
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+function initLectureNotes() {
+  const openBtn = document.getElementById('lectureNotesBtn');
+  const closeBtn = document.getElementById('lectureNotesClose');
+  const textarea = document.getElementById('lectureNotesInput');
+  const modal = document.getElementById('lectureNotesModal');
+  if (!openBtn || !textarea || !modal || openBtn.dataset.bound === '1') return;
+  openBtn.dataset.bound = '1';
+
+  let saveTimer = null;
+  openBtn.addEventListener('click', openLectureNotesModal);
+  closeBtn?.addEventListener('click', closeLectureNotesModal);
+  modal.querySelectorAll('[data-close-notes]').forEach(el => {
+    el.addEventListener('click', closeLectureNotesModal);
+  });
+  textarea.addEventListener('input', () => {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveLectureNotes, 300);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeLectureNotesModal();
+  });
+}
+
 function initScrollFab() {
   const fab = document.getElementById('scrollTopFab');
   if (!fab) return;
@@ -766,11 +838,13 @@ function initServiceWorker() {
 
 async function init() {
   initTheme();
+  initLaserPointer();
   initInteractivity();
   initScrollFab();
   initJumpSummary();
   bindJumpSummaryClicks();
   initLectureWidthToggle();
+  initLectureNotes();
   initMobileStudyUi();
   document.getElementById('backToHomeBtn')?.addEventListener('click', goToSubjectHome);
   document.getElementById('backToHubBtn')?.addEventListener('click', goToHubHome);
