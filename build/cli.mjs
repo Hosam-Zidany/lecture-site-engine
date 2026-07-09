@@ -197,14 +197,13 @@ async function main() {
   await mkdir(lecturesOut, { recursive: true });
 
   const manifestSrc = path.join(subjectDir, 'lectures/manifest.json');
-  if (mdFiles.length && existsSync(manifestSrc)) {
-    const manifest = JSON.parse(await readFile(manifestSrc, 'utf8'));
+  const manifest = JSON.parse(await readFile(manifestSrc, 'utf8'));
 
-    const builtFiles = [];
-    /** @type {Map<string, { parsedAt: string, summary: ReturnType<typeof lectureSummaryFromLec>, jsonName: string }>} */
-    const parsedByJson = new Map();
+  const builtFiles = [];
+  /** @type {Map<string, { parsedAt: string, summary: ReturnType<typeof lectureSummaryFromLec>, jsonName: string }>} */
+  const parsedByJson = new Map();
 
-    for (const name of mdFiles) {
+  for (const name of mdFiles) {
     const text = normalizeLectureMd(await readFile(path.join(subjectDir, 'lectures', name), 'utf8'));
     const doc = parser.parseDocument(text);
     const lec = doc.lectures[0];
