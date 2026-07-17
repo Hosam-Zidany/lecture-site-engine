@@ -3,6 +3,7 @@ import { inlineMd } from '../core/inline-md.js';
 import { ms } from '../core/icons.js';
 import { renderBlocks } from '../blocks/index.js';
 import { calloutHtml } from '../blocks/handlers.js';
+import { mcqSectionAnchor } from '../core/slug.js';
 
 function diffBadgeClass(d) {
   if (d === 'سهل') return 'bg-primary/20 text-primary';
@@ -162,7 +163,8 @@ export function renderMCQ(questions, partId) {
     // changes so consecutive questions from the same section stay grouped
     // visually without repeating the label on every card.
     if (q.section && q.section !== lastSection) {
-      html += `<h3 class="font-headline-md text-headline-md text-primary dark:text-inverse-primary flex items-center gap-sm pt-md first:pt-0">
+      const secId = `${partId}-${mcqSectionAnchor(q.section)}`;
+      html += `<h3 id="${esc(secId)}" class="font-headline-md text-headline-md text-primary dark:text-inverse-primary flex items-center gap-sm pt-md first:pt-0 scroll-mt-16">
         ${ms('menu_book', false, 'text-lg')} ${esc(q.section)}
       </h3>`;
     }
