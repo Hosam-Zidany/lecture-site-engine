@@ -99,20 +99,25 @@
 #### 📊 المخطط: خطوات التصميم الموجه للكائنات
 
 ```mermaid
-graph LR
-    A["1. System Context<br/>فهم السياق"] --> B["2. Interaction Model<br/>نموذج التفاعلات"]
-    B --> C["3. Architectural Design<br/>التصميم المعمّاري"]
-    C --> D["4. Object Identification<br/>تحديد الكائنات"]
-    D --> E["5. Design Model<br/>نموذج التصميم"]
+graph TB
+    A["STEP 1<br/>System Context Model<br/>فهم السياق والعلاقات الخارجية"]
+    B["STEP 2<br/>Interaction Model<br/>نموذج التفاعلات والـ Use Cases"]
+    C["STEP 3<br/>Architectural Design<br/>تقسيم للمكونات الكبيرة"]
+    D["STEP 4<br/>Object Class Identification<br/>تحديد الكائنات"]
+    E["STEP 5<br/>Design Models<br/>رسم UML (Static + Dynamic)"]
+    F["STEP 6<br/>Interface Specification<br/>تحديد الواجهات"]
     
-    style A fill:#e1f5ff
-    style B fill:#e1f5ff
-    style C fill:#fff3e0
-    style D fill:#f3e5f5
-    style E fill:#e8f5e9
+    A --> B --> C --> D --> E --> F
+    
+    style A fill:#bbdefb,stroke:#1976d2,stroke-width:3px
+    style B fill:#bbdefb,stroke:#1976d2,stroke-width:3px
+    style C fill:#fff9c4,stroke:#f57f17,stroke-width:3px
+    style D fill:#e1bee7,stroke:#7b1fa2,stroke-width:3px
+    style E fill:#c8e6c9,stroke:#388e3c,stroke-width:3px
+    style F fill:#ffccbc,stroke:#d84315,stroke-width:3px
 ```
 
-**الشرح:** كل خطوة تبني على السابقة. لا يمكن تحديد الكائنات (4) قبل فهم التفاعلات (2).
+**ملاحظة حاسمة:** كل خطوة **يجب** تكون قبل التالية. لا يمكن تحديد الكائنات (4) قبل فهم البنية المعمّارية (3).
 
 ---
 
@@ -207,29 +212,47 @@ graph LR
 
 ---
 
-#### 📊 المخطط: System Context للمحطة الجوية
+#### 📊 المخطط: System Context Model للمحطة الجوية (من المحاضرة)
 
-```mermaid
-graph TB
-    WIS["Weather Information<br/>System"]
-    WS["Weather<br/>Station"]
-    CS["Control<br/>System"]
-    SAT["Satellite<br/>Communication"]
-    
-    WIS ---|1| WS
-    WS ---|1| CS
-    WS ---|1| SAT
-    WIS ---|1| SAT
-    
-    style WS fill:#ff9800,stroke:#e65100,color:#fff
-    style WIS fill:#2196f3,stroke:#0d47a1,color:#fff
-    style CS fill:#2196f3,stroke:#0d47a1,color:#fff
-    style SAT fill:#2196f3,stroke:#0d47a1,color:#fff
+**النموذج الدقيق من الـ PDF:**
+
+```
+                         ┌─────────────────────────┐
+                         │  Weather Information    │
+                         │  System                 │
+                         │  (System الخارجي)       │
+                         └────────────┬────────────┘
+                                      │
+                                      │ 1
+                                      │
+        ┌─────────────────────────────┼────────────────────┐
+        │                             │                    │
+        │                             │                    │
+┌───────▼──────────┐        ┌─────────▼──────────┐    ┌───▼───────────┐
+│   Control        │        │  Weather Station   │    │  Satellite    │
+│   System         │        │  (النظام بتاعنا)   │    │  Link         │
+│                  │        │                    │    │               │
+│ (External)       │        │ (Our System)       │    │ (External)    │
+└────────┬─────────┘        └─────────┬──────────┘    └───┬───────────┘
+         │ 1                          │ 1.n                │
+         │                            │                    │
+         └────────────────┬───────────┘                    │
+                          │                                │
+                          └────────────────┬───────────────┘
+                                          │
+                                   (Communication via Satellite)
 ```
 
-**الشرح:** 
-- الصندوق البرتقالي = النظام اللي بنصمّمه (Weather Station)
-- الصناديق الزرقاء = الأنظمة الخارجية الأخرى
+**التوضيح بالـ Associations:**
+- Weather Station (النظام بتاعنا) ←→ Weather Information System (1:1)
+- Weather Station ←→ Control System (1:1)  
+- Weather Station ←→ Satellite (1:n) — متصل مع satellites متعددة
+- System Boundaries واضحة: كل شيء خارج الـ Box برتقالي = External
+
+**الفائدة:** يوضح أن:
+- ✓ محطة الطقس **لا تتصل مباشرة** مع Weather Information System
+- ✓ **يجب** الاتصال عبر Satellite Link
+- ✓ Control System يقدر يعطيها أوامر مباشرة
 
 #### 📖 الشرح
 
@@ -293,25 +316,51 @@ System Context يقول **من** الأنظمة الأخرى؛ Interaction Model
 
 ---
 
-#### 📊 المخطط: Use Case Diagram
+#### 📊 المخطط: Interaction Model (Use Cases) — من الـ PDF
 
-```mermaid
-graph LR
-    User["User / System"]
-    UC1["Report Weather"]
-    UC2["Report Status"]
-    
-    User -->|initiates| UC1
-    User -->|initiates| UC2
-    
-    style UC1 fill:#4caf50
-    style UC2 fill:#4caf50
-    style User fill:#2196f3
+**جميع الـ Use Cases الفعلية:**
+
+```
+                              Weather Station System
+     ┌─────────────────────────────────────────────────────────────┐
+     │                                                              │
+     │  ┌─────────────────┐     ┌──────────────────┐              │
+     │  │  Report Weather │     │  Report Status   │              │
+     │  └────────┬────────┘     └────────┬─────────┘              │
+     │           │                       │                         │
+     │  ┌────────┴──────────────┬────────┴──────────┐              │
+     │  │                       │                   │              │
+     │  ▼                       ▼                   ▼              │
+     │  O                       O                   O              │
+     │  |\ Weather Info      |\ Control         |\ Restart    │
+     │  | \ System           | \ System         | \ Shutdown  │
+     │  |  \                 |  \               |  \          │
+     │  |   O                |   O              |   O         │
+     │  └─────────────────────┴─────────────────┴──────┘     │
+     │                                                              │
+     │  Additional Use Cases:                                      │
+     │  • Remote Control (shutdown, restart, reconfigure,         │
+     │    powersave)                                               │
+     │                                                              │
+     └─────────────────────────────────────────────────────────────┘
+     
+     KEY ACTORS:
+     • Weather Information System — يطلب البيانات
+     • Control System — يرسل أوامر و يطلب الحالة
 ```
 
-**الشرح:** 
-- كل oval = use case (حالة استخدام)
-- الخط = علاقة بين Actor والـ use case
+**جدول Use Cases الدقيق من المحاضرة:**
+
+| Use Case | Actor | Description | Trigger |
+|----------|-------|-------------|---------|
+| **Report Weather** | Weather Information System | Station يجمّع البيانات ويرسلها | WIS يطلب البيانات عبر Satellite |
+| **Report Status** | Control System | Station ترسل حالتها الحالية | Control System يطلب الحالة |
+| **Shutdown** | Control System | إيقاف المحطة | أمر من Control System |
+| **Restart** | Control System | تشغيل المحطة من جديد | أمر من Control System |
+| **Reconfigure** | Control System | تغيير settings المحطة | أمر من Control System |
+| **Power Save** | Control System | تقليل استهلاك الطاقة | أمر من Control System |
+
+**ملاحظة:** جميع الـ Use Cases عند المحطة (System) — الـ Actors خارجيين يطلبونها.
 
 #### 📖 الشرح
 
@@ -383,35 +432,62 @@ graph LR
 
 ---
 
-#### 📊 المخطط: System Architecture
+#### 📊 المخطط: Architecture Design للمحطة (من الـ PDF)
 
-```mermaid
-graph TB
-    subgraph Management["Management Layer"]
-        FM["Fault Manager"]
-        CM["Configuration Manager"]
-        PM["Power Manager"]
-    end
-    
-    subgraph Communication["Communication Layer"]
-        CL["Communication Link"]
-    end
-    
-    subgraph Processing["Processing Layer"]
-        C["Communications"]
-        D["Data Collection"]
-        I["Instruments"]
-    end
-    
-    Management -->|coordinates| Communication
-    Communication -->|connects| Processing
-    
-    style Management fill:#fff3e0
-    style Communication fill:#e3f2fd
-    style Processing fill:#f3e5f5
+**البنية المعمّارية الدقيقة:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  WEATHER STATION SYSTEM ARCHITECTURE                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────┬───────────────────┬──────────────────────┐ │
+│  │ ◄subsystem►     │ ◄subsystem►       │ ◄subsystem►          │ │
+│  │ Fault Manager   │ Configuration     │ Power Manager        │ │
+│  │                 │ Manager           │                      │ │
+│  └────────┬────────┴─────────┬─────────┴──────────────┬───────┘ │
+│           │                  │                        │         │
+│           └──────────────────┼────────────────────────┘         │
+│                              │                                   │
+│           ╔═════════════════════════════════════════╗           │
+│           ║  Communication Link (Satellite)        ║           │
+│           ║  (Central Hub/Bus)                     ║           │
+│           ╚══════════════════╤═════════════════════╝           │
+│                              │                                   │
+│           ┌──────────────────┼────────────────────┐             │
+│           │                  │                    │             │
+│  ┌────────▼────────┐ ┌───────▼────────┐ ┌───────▼─────────┐   │
+│  │ ◄subsystem►     │ │ ◄subsystem►    │ │ ◄subsystem►     │   │
+│  │ Communications  │ │ Data Collection│ │ Instruments     │   │
+│  │                 │ │                │ │                 │   │
+│  │ • Receiver      │ │ • Transmitter  │ │ • Thermometer   │   │
+│  │ • Processor     │ │ • Logger       │ │ • Anemometer    │   │
+│  │                 │ │ • Formatter    │ │ • Barometer     │   │
+│  └─────────────────┘ └────────────────┘ └─────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+
+SUBSYSTEMS (6 كاملة):
+1. Fault Manager — إدارة الأخطاء والـ recovery
+2. Configuration Manager — تعديل settings
+3. Power Manager — إدارة الطاقة والـ power saving
+4. Communications — الاتصال عبر Satellite
+5. Data Collection — جمع البيانات من الأجهزة
+6. Instruments — الأجهزة الفعلية (thermometers, etc.)
+
+CONNECTIONS:
+• Communication Link = Hub مركزي (كل subsystems متصلة به)
+• Management subsystems (1,2,3) = تحكم على الـ resources
+• Operational subsystems (4,5,6) = تشتغل مع البيانات
+
+PATTERN USED:
+Layered Architecture:
+  - Layer 1 (Top): Management (Fault, Config, Power)
+  - Layer 2 (Middle): Communication Link
+  - Layer 3 (Bottom): Operations (Comms, Data Collection, Instruments)
 ```
 
-**الشرح:** النظام ينقسم لـ subsystems متخصصة، كل واحد لها دور محدد.
+**المهم: Communication Link ليست subsystem عادية — هي الـ Bus الرئيسي اللي كل الـ subsystems متصلة بيه!**
 
 #### 📖 الشرح
 
@@ -958,62 +1034,190 @@ interface Weapon:
 </details>
 
 ---
+## الجزء الثاني: ملخص شامل (Alternative Complete Reading)
 
-## الجزء الثاني: الملخص الشامل
+---
 
-### مقدمة سريعة
+### الفكرة الأساسية
 
-تطوير البرمجيات بينقسم لمرحلتين متسلسلتين: قبل كل شيء، تحتاج **تصميم** معقول اللي يقول شنو البنية. بعدين تقدر **تطبّق** بناءً على التصميم.
+هاي المحاضرة بتحكي عن أهم مرحلتين بعد ما تخلص من المتطلبات: **Design** و **Implementation**. يعني بعد ما تعرف "شنو" العميل بدو، لازم تعرف "كيف" رح تبنيه وبعدين "كيف" رح تكتبه فعلياً كود شغّال. هاي المرحلة هي القلب النابض لأي مشروع برمجي — لأنه هون بيتحدد إذا المشروع رح يطلع منظّم وقابل للصيانة، ولا رح يطلع فوضى ما حدا فاهم شو فيها بعد شهرين.
 
-### Design (التصميم)
+### ليش يهمك؟
 
-**التصميم = القرار: كيف نبني النظام؟**
+تخيّل حالك بتبني بيت بدون مخطط هندسي — رح تبدأ تبني حيط، وبعدين تكتشف إنه الحمام لازم يكون بمكان تاني، فتهدم وتبني من جديد. بالضبط نفس الشي بصير بالبرمجة لو قفزت على التصميم وبلشت تكتب كود على طول. التصميم بيعطيك "الخارطة" قبل ما تبلش البناء، وهاد بيوفرلك وقت وفلوس وصداع كتير. خاصة انتي كـ co-founder بمشروع Launchpad وبتشتغلوا على BaaS بـ Rust/gRPC، فهم هاي المرحلة صح رح يأثر مباشرة على شكل الـ architecture اللي رح تبنوها.
 
-في Object-Oriented Design، نتّبع 5 خطوات:
+### المتطلبات السابقة
 
-**1. فهم السياق (System Context)**
-نرسم نقطة واحدة وكل الأنظمة حولها. الهدف: تحديد واضح لحدود نظامنا. شنو بتاعنا؟ شنو بتاع غيرنا؟
+قبل ما تفهم هاي المحاضرة، لازم يكون عندك فكرة عن:
+- شنو هو `Object-Oriented Programming` (OOP) — Classes, Objects, Inheritance
+- شنو هو `UML` بشكل عام (حتى لو ما تعرف كل التفاصيل)
+- فكرة بسيطة عن `Requirements` — يعني شنو معناها متطلبات النظام
 
-**2. نموذج التفاعلات (Interactions)**
-كل حالة استخدام = Use Case. مثل: "المستخدم يسجّل دخول"، "النظام يرسل بيانات". بسيط وواضح، بدون تفاصيل.
+---
 
-**3. البنية المعمّارية (Architecture)**
-نقسّم النظام لـ major components (أجزاء كبيرة). كل component يشتغل على تخصصه. هاي تسمح للفريق يشتغلوا بتوازي.
+### التصميم والتطبيق: شنو الفرق بينهم بالضبط؟
 
-**4. تحديد الكائنات (Object Identification)**
-الآن نروح للتفاصيل. كل component من components الكبيرة تحتوي كائنات (classes). طرق مختلفة: نقرأ الوصف ونحدد nouns، أو نفكر بـ "شنو الأشياء الحقيقية هنا"، أو نمشي عبر السيناريوهات. لا توجد طريقة واحدة صحيحة.
+خلّينا نبلش من الأساس. **Software Design** هي عملية إبداعية — نعم، إبداعية مو ميكانيكية — بتحدد فيها شنو الـ components (المكونات) اللي بدك ياها بالنظام، وشلون بترتبط ببعض. هاي العملية بتبنى بالكامل على متطلبات العميل. يعني إذا العميل قالك "بدي نظام يدير مخزون المتجر"، انت هون بتقرر: هل بدي class اسمه Product؟ هل بدي class اسمه Inventory؟ شلون بيتواصلوا مع بعض؟
 
-**5. نموذج التصميم (Design Models)**
-رسم رسمي بـ UML: Class Diagrams (البنية الثابتة)، Sequence Diagrams (ترتيب الاستدعاءات)، State Diagrams (تغيّر الحالات). هاي الرسوميات = خارطة الطريق للمبرمجين.
+أما **Software Implementation** فهي ببساطة تحويل هاد التصميم لبرنامج فعلي — يعني كتابة الكود اللي يجسّد القرارات اللي اخدتها بمرحلة التصميم.
 
-**ملخص صغير:** السياق → التفاعلات → البنية → الكائنات → الرسومات.
+النقطة المهمة جداً هون، وهاي غالباً بتلخبط الطلاب: **مو كل تصميم لازم يكون رسمي وموثّق بـ UML**. أحياناً، خاصة بالمشاريع الصغيرة أو لما تشتغل بلغات زي Python (اللي مو object-oriented بشكل صارم زي Java مثلاً)، التصميم ممكن يكون بس فكرة برأس المبرمج، أو رسمة سريعة على whiteboard. المحاضرة بالحرفة بتقول: "استخدم UML لما تشتغل OO، مو لما تشتغل Python!" — يعني الأداة والرسميات بتتغير حسب حجم وطبيعة المشروع.
 
-### Implementation (التطبيق)
+فكّر فيها هيك: لو عم تبني script صغير يعالج ملف Excel، ما رح تقعد ترسملها Class Diagram وSequence Diagram — بس فكرة برأسك كافية. لكن لو عم تبني نظام بنكي معقد فيه 50 مبرمج، هون لازم تصميم موثّق ورسمي عشان الكل يفهم نفس الشي.
 
-**التطبيق = تحويل التصميم لبرنامج يشتغل.**
+---
 
-أهم نقاط:
+### الخطوات الخمس في Object-Oriented Design
 
-**Reuse**: ما تكتب كل شيء من الصفر. استخدم libraries، frameworks، أنظمة موجودة. توفّر وقت وتقلل bugs.
+هاي الجزء الأساسي بالمحاضرة، وبيتكون من خمس خطوات متسلسلة، كل وحدة منهم بتبني على اللي قبلها. خلّينا نمشي فيهم وحدة وحدة، وبنستخدم مثال محطة الطقس (Weather Station) اللي جابته المحاضرة كـ case study.
 
-**Configuration Management**: النظام بيطلع versions كثيرة. لازم نتابع: أي version الحالي؟ أي version اختبرنا؟ بدون tracking، chaos.
+**الخطوة الأولى: System Context — فهم السياق والتفاعلات الخارجية**
 
-**Host-Target**: نطور على جهازنا (host)، لكن ينتهي التطبيق يشتغل على جهاز آخر (target). قد يكون مختلف تماماً (OS، processor). نستخدم simulators عشان نختبر.
+أول شي لازم تعمله، قبل ما تفكر بأي كود، هو تفهم: النظام بتاعي وين بده يوقف بالنسبة للأنظمة التانية حوله؟ مثلاً بمحطة الطقس، النظام بتاعنا (Weather Station) بيتواصل مع Control System (يعطيها أوامر زي "أطفي" أو "اعمل restart")، ومع Weather Information System (يطلب منها بيانات الطقس)، ومع Satellite (وسيلة الاتصال).
 
-### الفكرة الكبيرة
+الفكرة الأساسية هون: نحدد **حدود النظام** (system boundaries). يعني نعرف شنو الوظائف اللي **نحن** رح نبنيها بنظامنا، وشنو الوظائف اللي موجودة **بأنظمة تانية** ومو من شغلنا. هاد مهم كتير لأنه بدون هاد الفهم، ممكن تبلش تبني features مو من مسؤوليتك، أو تنسى features لازم تكون موجودة عندك.
 
-التصميم + التطبيق = أساس كل مشروع ناجح. لو أهملت التصميم، التطبيق بيصير فوضى. لو أهملت Reuse في التطبيق، بتضيع كتير من الوقت.
+لتمثيل هاد بصرياً، بنستخدم **System Context Model** — وهو structural model (يعني بيوضح البنية، مو السلوك) بيستخدم associations (خطوط ربط) بين نظامنا والأنظمة الخارجية. ممكن نرسمه بـ simple block diagram — مربعات وخطوط، بسيط جداً.
 
-### أمثلة واقعية
+**الخطوة الثانية: Interaction Model — نموذج التفاعلات**
 
-**في Launchpad (e-commerce):**
-- **Design**: حددنا الـ Components (User Service, Product Service, Payment Service)
-- **Implementation**: استخدمنا frameworks (Django/FastAPI), reused existing payment libraries, setup version control
+بعد ما عرفنا مين حوالينا (Context)، لازم نعرف **كيف** بيصير التفاعل بالضبط. هون بندخل على مفهوم الـ **Use Case** — يعني حالة استخدام محددة للنظام. كل use case بيمثل طريقة واحدة يقدر فيها actor (شخص أو نظام خارجي) يستخدم نظامنا.
 
-**في لعبة:**
-- **Design**: Character, Enemy, Weapon classes مع state diagram بين (Idle, Attacking, Dead)
-- **Implementation**: استخدم game engine (Unity/Unreal)، libraries موجودة للـ physics
+بمثال محطة الطقس، عندنا Use Cases زي: "Report Weather" (Weather Information System بيطلب البيانات)، و"Report Status" (Control System بيطلب حالة المحطة)، و"Remote Control" (Control System بيرسل أوامر زي shutdown, restart, reconfigure, powersave).
 
+المهم هون: **ما بدنا تفاصيل كتير بهاي المرحلة**. المحاضرة بتنص صراحة على هاد: "does not include too much detail". يعني إحنا بس عم نعطي overview عام لكل الطرق الممكنة لاستخدام النظام، بدون الدخول بتفاصيل كل خطوة بالضبط — هاد رح يجي لاحقاً بالـ Sequence Diagrams.
+
+لتمثيل هاد، بنستخدم **Use Case Diagram**: كل use case بيتمثل بـ ellipse (بيضاوي)، والـ actor (الكيان الخارجي) بيتمثل بـ stick figure (رسمة إنسان بسيطة).
+
+**الخطوة الثالثة: Architectural Design — التصميم المعمّاري**
+
+هون بنبدأ نفكر بالبنية الكبيرة للنظام. بعد ما عرفنا كل التفاعلات الممكنة، لازم نحدد: النظام بدو ينقسم لأي أجزاء كبيرة (major components)؟ وشلون هاي الأجزاء بترتبط ببعضها؟
+
+بمثال محطة الطقس، النظام انقسم لستة subsystems: Fault Manager (إدارة الأخطاء)، Configuration Manager (إدارة الإعدادات)، Power Manager (إدارة الطاقة) — هدول الثلاثة بيشكلوا طبقة الإدارة. وبعدين عندنا Communication Link كنقطة اتصال مركزية. وأخيراً Communications، Data Collection، و Instruments كطبقة تنفيذية.
+
+الفايدة الأساسية من هاي الخطوة إنها بتسمح للفريق يشتغل بشكل متوازي — كل مبرمج أو فريق صغير ياخد subsystem وحده ويشتغل عليه لحاله، طالما الكل ملتزم بالـ interfaces المتفق عليها. هاد بيسرّع التطوير كتير بالمشاريع الكبيرة.
+
+**الخطوة الرابعة: Object Class Identification — تحديد الكائنات**
+
+هاي أصعب خطوة، وبصراحة، المحاضرة بتقول هاد بالحرفة: "There is no 'magic formula' for object identification." يعني ما في صيغة سحرية أو خوارزمية تقولك بالضبط شنو الـ classes اللي لازم تعملها. الموضوع بيعتمد على **خبرة المصمم**، و**فهمه لمجال العمل** (domain knowledge)، وكمان — وهاد مهم — إنها عملية **تكرارية** (iterative). يعني حتى الخبراء ما بيوصلوا للتصميم الصحيح من أول محاولة، وغالباً بيرجعوا يعدّلوا.
+
+في أربع طرق أساسية تقدر تستخدمها:
+
+الطريقة الأولى: **Grammatical Analysis** — تحليل لغوي. تاخد وصف النظام بالكلام العادي، وتحدد: الأسماء (nouns) بتصير objects، والأفعال (verbs) بتصير operations أو methods. مثلاً لو الوصف بيقول "weather station **records** local **weather information**" — هون "weather station" و"weather information" هدول objects محتملة، و"records" هي operation.
+
+الطريقة الثانية: **Tangible Entities** — الكيانات الملموسة. هون بتفكر بأنواع مختلفة من الأشياء اللي ممكن تصير classes: **Things** (أشياء مادية زي Aircraft)، **Roles** (أدوار زي manager أو doctor)، **Events** (أحداث زي request)، **Interactions** (تفاعلات زي meetings)، **Location** (أماكن زي offices)، و**Organizational units** (وحدات تنظيمية زي companies).
+
+الطريقة الثالثة: **Scenario-based Analysis** — تحليل السيناريوهات. تاخد كل use case حددته بالخطوة الثانية، وتمشي فيه خطوة خطوة، وتحدد: شنو الأشياء (objects) اللي شاركت بهاد السيناريو، وشنو attributes وmethods ظهرت.
+
+الطريقة الرابعة: **Behavioural Approach** — المنهج السلوكي. هون بتسأل نفسك: "مين اللي بيشارك بأي سلوك؟" يعني بتنظر للسلوكيات (behaviors) وبتحدد مين الـ objects اللي مسؤولة عنها.
+
+**الخطوة الخامسة: Design Models — نماذج التصميم**
+
+آخر خطوة، لازم نرسم كل هاد الفهم بشكل رسمي باستخدام UML. الـ Design Model لازم يحقق كم شرط: يوضح الـ object classes والـ associations بينهم، ويكون **bridge** (جسر) بين المتطلبات والتطبيق، ويكون **abstract** بما يكفي (يعني ما فيه تفاصيل زايدة عن اللزوم)، بس بنفس الوقت يكون فيه **تفاصيل كافية** للمبرمجين يقدروا يكتبوا الكود منه.
+
+المحاضرة بتذكر إنه بـ UML في حوالي 13 نوع مختلف من الـ models، لكن **ما محتاج تستخدمهم كلهم**! عادة، بنكتفي بنوعين أساسيين:
+
+**Structural Models (Static)** — بتوضح البنية الثابتة للنظام. أهم مثال هون هو الـ **Class Diagram**، اللي بيوضح كل class، الـ attributes والـ methods بتاعتها، والعلاقات بينها زي Generalization (وراثة، بترمز لها بـ `<|—`)، Association (استخدام عادي)، وComposition (جزء من الكل، برمز `◆—`).
+
+**Dynamic Models** — بتوضح السلوك أثناء التشغيل. هون عندنا نوعين رئيسيين:
+- **Sequence Diagram**: بيوضح ترتيب الاستدعاءات (calls) بين الـ objects بمرور الوقت. الـ objects بترتب أفقياً بالأعلى، والوقت بيمثل عمودياً (نقرأ من فوق لتحت)، والأسهم الملصّقة بتمثل الاستدعاءات.
+- **State Diagram**: بيوضح كيف object معين بيغيّر حالته استجابة لأحداث معينة. المحاضرة بتنبّه لنقطة مهمة: **مو كل object محتاج state diagram**! أغلب الـ objects بسيطة كفاية إنها ما تحتاج هاد التمثيل، وإضافته رح يزيد تعقيد بدون داعي. بس الـ objects المعقدة اللي عندها حالات متعددة ومتشابكة (زي محطة الطقس نفسها اللي عندها حالات Shutdown, Running, Configuring, Collecting, Summarizing, Transmitting) بتستفيد كتير من هاد النوع من الرسم.
+
+---
+
+### Interface Specification — تحديد الواجهات
+
+بعد ما خلصنا التصميم، آخر نقطة قبل الانتقال للتطبيق هي تحديد **الواجهات** (interfaces) بوضوح. ليش هاد مهم؟ لأنه لما تحدد بوضوح شنو الخدمات (services) اللي كل object أو مجموعة objects بتقدمها — يعني الـ **signatures** (المعاملات وأنواع الإرجاع) والـ **semantics** (شنو بالضبط الميثود بتعمل) — هاد بيسمح لفرق مختلفة يشتغلوا **بالتوازي** على أجزاء مختلفة من النظام، طالما كل واحد ملتزم بالـ interface المتفق عليها.
+
+نقطة مهمة جداً هون بتذكرها المحاضرة: **المصممين لازم يتجنبوا تصميم تفاصيل الـ implementation جوا الـ interface نفسها**. يعني الـ interface لازم تبين بس "شنو" الميثود بتعمل (input, output, behavior)، وتخفي "كيف" بتعملها جوا الـ object نفسه. هاد مبدأ أساسي بالـ encapsulation.
+
+---
+
+### Implementation — التطبيق
+
+خلصنا التصميم، هلق ننتقل للتطبيق الفعلي. المحاضرة هون بتفترض إنك أصلاً عندك مستوى جيد بالبرمجة (يعني ما رح تشرح "كيف تكتب for loop")، وبتركز على ثلاث نقاط أساسية بتفرق كتير بين برنامج احترافي وبرنامج هاوي:
+
+**النقطة الأولى: Reuse — إعادة الاستخدام**
+
+المبدأ الذهبي هون: **"do not reinvent the wheel"** — ما تعيد اختراع العجلة. من الستينات لغاية التسعينات كان الناس يكتبوا كل شي من الصفر (from scratch)، لكن هاد أصبح غير عملي خالص للأنظمة التجارية والـ internet-based اليوم — بسبب التكلفة والوقت. 
+
+في أربع مستويات لل reuse، من الأعلى للأدنى بمستوى التجريد:
+- **Abstraction**: ما بتعيد استخدام كود مباشرة، بس بتستفيد من معرفة design patterns وarchitectural patterns ناجحة استخدمها غيرك قبلك.
+- **Object**: بتاخد objects من library جاهزة، بدون ما تكتب كود — زي استخدام JUnit للـ testing أو JavaMail للإيميلات.
+- **Component**: هون بتحتاج تكتب شوي كود عشان تربط الـ component مع نظامك.
+- **System**: بتعيد استخدام application system كامل، بس هاد بيحتاج configuration (إضافة أو تعديل كود) عشان يناسب احتياجاتك.
+
+فوايد الـ Reuse كتيرة: بتطور أنظمة جديدة بسرعة أكبر، بتقلل مخاطر التطوير، بتخفض التكاليف، وبتحصل على برمجيات أكثر موثوقية (لأنها مجربة قبل — tested before!).
+
+بس، خلّينا نكون واقعيين — الـ Reuse مو مجاني. في تكاليف مرتبطة فيه: **تكلفة الوقت** (تدور على شي تقدر تعيد استخدامه، تتأكد إنه بيلبي احتياجاتك، تختبره ببيئتك)، **تكلفة الشراء** (خصوصاً للـ COTS — Commercial Off-The-Shelf، اللي ممكن تكون غالية كتير)، **تكلفة التكييف والتعديل** (عشان تعكس متطلبات نظامك بالضبط)، و**تكلفة التكامل** (ربط الأجزاء القابلة لإعادة الاستخدام مع بعضها، وكمان مع الكود الجديد اللي بتكتبه).
+
+**النقطة الثانية: Configuration Management — إدارة التكوين**
+
+خلال عملية التطوير، رح يطلع عندك **versions كتيرة** من كل component بالنظام — كل ما عدّلت شي، صار عندك version جديدة. من غير نظام يتابع هاد، رح تضيع بسهولة وممكن تستخدم version غلط بالخطأ.
+
+الـ Configuration Management عندها ثلاث أنشطة أساسية:
+- **Version Management**: يتابع الـ versions المختلفة لكل component.
+- **System Integration**: يساعد المطورين يحددوا بالضبط أي versions من الـ components استخدموها لبناء كل version من النظام الكامل — وهاد بيساعد بالـ auto compiling كمان.
+- **Problem Tracking**: يسمح للمستخدمين يبلّغوا عن bugs، وللمطورين يشوفوا مين شغال على أي bug ومتى تم حلها.
+
+المحاضرة بتذكر أدوات محددة زي **ClearCase**, **Subversion**, و**BugZilla** — وطبعاً اليوم بنضيف عليهم Git وGitHub كأدوات معاصرة أكتر.
+
+**النقطة الثالثة: Host-Target Development**
+
+آخر نقطة بالتطبيق: أحياناً بتطور على جهاز (**host system**)، لكن البرنامج بده يشتغل بالنهاية على جهاز مختلف تماماً (**target system**). أحياناً هدول الجهازين متشابهين، لكن غالباً بيكونوا مختلفين تماماً — مثلاً تطور على Windows PC قوي، لكن التطبيق النهائي رح يشتغل على جهاز embedded بسيط أو موبايل بموارد محدودة.
+
+عشان تختبر الكود بظروف قريبة من الـ target قبل ما تنشره فعلياً، بتستخدم **simulators** — أدوات بتحاكي بيئة الـ target system على الـ host system بتاعك.
+
+---
+
+### الأخطاء الشائعة والمفاهيم الخاطئة
+
+#### الفهم الخاطئ ❌:
+كتير طلاب بيفتكروا إنه لازم يمشوا بالخطوات الخمس بالـ `Object-Oriented Design` بترتيب صارم وحرفي، وما يرجعوا للخلف أبداً — يعني إذا وصلت للخطوة الرابعة (Object Identification)، ما فيك ترجع تعدّل الـ Architecture (الخطوة الثالثة).
+
+#### الفهم الصحيح ✅:
+الخطوات هاي موجهات عامة (guidelines) مو قوانين صارمة. التصميم بطبيعته عملية **تكرارية** — تماماً زي ما المحاضرة قالت عن Object Identification: "أنت غير محتمل توصل للصح من أول مرة." يعني طبيعي جداً إنك تكتشف بالخطوة الرابعة إنه في مشكلة بالـ Architecture، وترجع تعدّلها.
+
+---
+
+#### الفهم الخاطئ ❌:
+كتير ناس بيفتكروا إنه Software Design لازم دايماً يكون موثّق رسمياً بـ UML diagrams واضحة ومفصّلة، وإلا فهو "مو تصميم حقيقي".
+
+#### الفهم الصحيح ✅:
+المحاضرة بتقول بالحرفة: "It isn't necessary to describe the design in detail using UML... use it when OO, not Python!" التصميم ممكن يكون بس فكرة برأس المبرمج أو رسمة سريعة على whiteboard، وهاد **تصميم صحيح ومقبول** — خصوصاً بالمشاريع الصغيرة أو اللغات الديناميكية زي Python. الرسميات بـ UML بتصير أكتر أهمية بالأنظمة الكبيرة الـ Object-Oriented المعقدة.
+
+---
+
+#### الفهم الخاطئ ❌:
+في اعتقاد شائع إنه كل object بالنظام لازم يكون عنده State Diagram خاص فيه، عشان "نغطي" كل الحالات الممكنة.
+
+#### الفهم الصحيح ✅:
+المحاضرة واضحة: "You don't usually need a state diagram for all of the objects in the system. Many of the objects in a system are relatively simple and a state model adds unnecessary detail to the design." استخدم State Diagram بس للـ objects المعقدة اللي فعلياً عندها سلوك متعدد الحالات ومتشابك.
+
+---
+
+#### الفهم الخاطئ ❌:
+كتير مبرمجين مبتدئين بيفتكروا إنه Reuse (إعادة استخدام الكود) دايماً مجاني ومربح 100% — يعني "خذ أي library موجودة واستخدمها، خلص الموضوع".
+
+#### الفهم الصحيح ✅:
+Reuse مفيد جداً، لكن عنده تكاليف حقيقية لازم تحسبها: وقت البحث والتقييم، تكلفة الشراء (خصوصاً COTS)، تكلفة التكييف عشان تناسب احتياجاتك بالضبط، وتكلفة التكامل مع باقي أجزاء نظامك. أحياناً الكتابة من الصفر ممكن تكون أرخص لو الـ component الجاهزة معقدة كتير أو ما بتناسب احتياجاتك.
+
+---
+
+### إيش ممكن يجي بالامتحان؟
+
+الأستاذ عادة بيحب يركز على:
+- الفرق الدقيق بين System Context Model (structural) وInteraction Model (dynamic)
+- ترتيب الخطوات الخمس بالـ OO Design وليش هاد الترتيب منطقي
+- أي طريقة تستخدم لتحديد الـ Object Classes بأي سيناريو (Grammatical vs Scenario-based vs Behavioral)
+- الفرق بين Structural Models وDynamic Models، ومتى تستخدم كل نوع
+- ليش State Diagram مو لازم لكل object
+- مستويات الـ Reuse الأربع (Abstraction, Object, Component, System) والفرق بينهم
+- الأنشطة الثلاث بالـ Configuration Management
+
+### الربط مع الموضوع الجاي
+
+بعد ما فهمنا Design وImplementation، الخطوة الطبيعية الجاية هي **Testing** — كيف نتأكد إنه اللي صممناه وطبقناه فعلاً بيحقق المتطلبات الأصلية؟ وبعدين **Deployment** — كيف نوصّل هاد المنتج للمستخدم النهائي. كل خطوة من هدول بتبني على الأساس اللي حطيناه هون بالتصميم والتطبيق.
 ---
 
 ## الجزء الثالث: 16 سؤال اختيار من متعدد

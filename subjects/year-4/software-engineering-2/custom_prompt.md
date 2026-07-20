@@ -6,7 +6,7 @@
 سأرسل محاضرة (PDF، نص، صور)، وعليك تحويلها إلى **دليل دراسي Markdown** متوافق مع SCHEMA.md v2.0.
 
 > **التركيز:** نظرية، مخططات، تصميم، جداول، كود شبه برمجي
-> **الخلاصة:** تصميم البرمجيات، متطلبات النظام، نماذج التطوير، والتطبيق على ألعاب
+> **الخلاصة:** تصميم البرمجيات، متطلبات النظام، نماذج التطوير، ومبادئ الهندسة الكلاسيكية
 
 ---
 
@@ -49,40 +49,9 @@
 | "مبدأ DRY" | PRACTICE | ممارسة مثبتة الفائدة |
 | "اختيار SDLC Model" | PRINCIPLE | عدة خيارات صحيحة حسب الحالة |
 | "Object-Oriented Principles" | PRINCIPLE | طرق تطبيق متعددة |
-| "Design Patterns في الألعاب" | PRINCIPLE | pattern مختلفة للمشاكل المختلفة |
+| "Design Patterns" | PRINCIPLE | pattern مختلفة للمشاكل المختلفة |
 | "Requirements specification steps" | FACT | عملية موحدة |
 | "Code review best practices" | PRACTICE | ممارسات لها فوائد واضحة |
-
----
-
-## 🎮 Focus: Game Development Context
-
-**هذا الموضوع شرح من منظور تطوير الألعاب.**
-
-### متى تستخدم Game Dev Examples:
-
-✅ **استخدم game dev مثال:**
-- شرح architecture (Graphics Engine، AI, Physics, Networking)
-- شرح design patterns (في الألعاب استخدام واضح)
-- شرح إدارة المشاريع (الألعاب أكتر تعقيداً من apps)
-- شرح testing (الألعاب صعبة جداً في الـ QA)
-
-### مثال: كيف يختلف Software Engineering في الألعاب؟
-
-| الجانب | Apps عادية | Indie Games | AAA Games |
-| --- | --- | --- | --- |
-| **Architecture** | بسيطة (Client-Server) | محدودة (Monolithic) | معقدة جداً (Multithreaded) |
-| **Optimization** | تقليل latency | Optimize rendering | Every frame counts (60 FPS) |
-| **Team** | مع QA dedicated | Designer + Programmer | 100+ specialists |
-| **Time to Market** | أسابيع | 6-12 شهر | سنتين+ |
-| **Testing** | automated | Manual + some automation | أسابيع من playtesting |
-
-### الاختلافات الأساسية:
-
-**في App عادي:** "اضغط الزر → request يروح للسيرفر → response ترجع"
-**في Game:** "اضغط الزر → immediate response (input lag بتكسر التجربة) → server update async"
-
-**ملخص:** استخدم أمثلة تدل على الفرق.
 
 ---
 
@@ -133,50 +102,50 @@
 ### مثال على مثال (Inception):
 
 ```markdown
-### 1.3 مثال متكامل: Design Principles في لعبة
+### 1.3 مثال متكامل: Design Principles في نظام حقيقي
 <!-- @type: example-for-topics-1.1-to-1.3 -->
 <!-- @covers: Single Responsibility + Open Closed + DRY -->
 
 #### 📌 السياق
-تطور لعبة منصات بسيطة، وتحتاج إدارة شخصيات وأعداء وخطوط.
+تطور نظام إدارة حسابات بنكية، وتحتاج التعامل مع عمليات مالية مختلفة.
 
-#### 🎮 السيناريو
+#### 💼 السيناريو
 
-**الحالة:** عندك character الآن، وتبي تضيف:
-1. نقاط الصحة (Health)
-2. نقاط الخبرة (Experience)
-3. مستوى الصعوبة (Difficulty)
+**الحالة:** عندك فئة Account وتبي تضيف:
+1. سحب الأموال (Withdrawal)
+2. إضافة فائدة (Interest)
+3. رسوم العمولة (Fees)
 
 **بدون principles (غلط):**
 ```
-class GameCharacter {
-    health, experience, level;
-    takeDamage() { ... }
-    gainExp() { ... }
-    adjustDifficulty() { ... }
-    render() { ... }
-    save() { ... }
-    load() { ... }
+class BankAccount {
+    balance, accountHolder, transactions;
+    withdraw() { ... }
+    addInterest() { ... }
+    applyFees() { ... }
+    updateBalance() { ... }
+    printStatement() { ... }
+    audit() { ... }
     // كل شيء في فئة واحدة عملاقة!
 }
 ```
 
 **مع Principles (صحيح):**
 ```
-class Character {
-    health; // مسؤولية واحدة: البيانات الأساسية
+class BankAccount {
+    balance; // مسؤولية واحدة: البيانات الأساسية
 }
 
-class HealthSystem {
-    takeDamage() { ... } // مسؤولية: إدارة الصحة
+class WithdrawalProcessor {
+    withdraw() { ... } // مسؤولية: معالجة السحب
 }
 
-class ExperienceSystem {
-    gainExp() { ... } // مسؤولية: إدارة الخبرة
+class InterestCalculator {
+    addInterest() { ... } // مسؤولية: حساب الفائدة
 }
 
-class DifficultyAdjuster {
-    adjustForDifficulty() { ... } // مسؤولية واحدة
+class FeeManager {
+    applyFees() { ... } // مسؤولية واحدة
 }
 ```
 
@@ -210,7 +179,7 @@ class DifficultyAdjuster {
 
 ### نصائح لـ Examples:
 
-✅ **استخدم حالة حقيقية** (game dev، banking system، إلخ)
+✅ **استخدم حالة حقيقية** (banking system، e-commerce، social media app، إلخ)
 
 ✅ **اجعل الفرق واضح** (غلط vs صحيح)
 
@@ -325,7 +294,7 @@ class DifficultyAdjuster {
 ✅ **افعل:**
 - ابدأ من ground zero (بدل ما تفترض معرفة)
 - كل مصطلح = تعريف فوري + مثال
-- أمثلة من indie games أو apps بسيطة
+- أمثلة من تطبيقات عملية بسيطة أو معقدة
 - "لماذا؟" أهم من "كيف؟"
 
 **مثال الفرق:**
@@ -687,7 +656,7 @@ coverage % = (عدد النقاط المشروحة / عدد النقاط في ا
 
 4. **اشرح **كل** الأفكار الرئيسية بالتفصيل:**
    - **ليس bullet points** — كاتب paragraphs متصلة تتدفق بشكل طبيعي
-   - **أمثلة عملية لكل فكرة** — من الحياة الحقيقية، من game dev، من Startup
+   - **أمثلة عملية لكل فكرة** — من الحياة الحقيقية، من أنظمة موجودة، من مشاريع متعددة الأحجام
    - **شرح الآلية** — كيف تعمل الفكرة في الواقع؟
    - **السياقات المختلفة** — متى تستخدمها؟ في أي حالة؟
    - **المقارنات العميقة** — مو بس فروقات، بس شرح كامل للفرق
@@ -1122,7 +1091,7 @@ graph LR
 - [ ] إذا أضفت مثال:
   - [ ] يوضح كيف تجتمع المفاهيم
   - [ ] يقارن غلط vs صحيح
-  - [ ] فيه scenario واقعي (game dev أو نظام حقيقي)
+  - [ ] فيه scenario واقعي (نظام حقيقي: بنك، متجر، منصة، إلخ)
   - [ ] ما هو مجرد تكرار للشرح
 
 ### الأجزاء الأخرى:
