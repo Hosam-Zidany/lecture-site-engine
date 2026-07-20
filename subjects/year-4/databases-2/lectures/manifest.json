@@ -5,7 +5,7 @@
     "year": "2025-2026",
     "academicYear": 4,
     "theme": "emerald-coral",
-    "enabledLectures":true,
+    "enabledLectures": true,
     "hubTag": "مادة حملة",
     "department": "تصميم"
   },
@@ -18,6 +18,27 @@
       "icon": "📌",
       "matIcon": "school",
       "badge": "المحاضرة ١ — جزء ١"
+    },
+    {
+      "path": "par1-sec2.md",
+      "num": 1,
+      "icon": "📖",
+      "matIcon": "menu_book",
+      "badge": "المحاضرة ١ — جزء ٢"
+    },
+    {
+      "path": "par2.md",
+      "num": 2,
+      "icon": "💻",
+      "matIcon": "code",
+      "badge": "المحاضرة ٢"
+    },
+    {
+      "path": "par3-sec1.md",
+      "num": 3,
+      "icon": "🎯",
+      "matIcon": "quiz",
+      "badge": "المحاضرة ٣ — جزء ١"
     }
   ],
   "lectureIcons": [
