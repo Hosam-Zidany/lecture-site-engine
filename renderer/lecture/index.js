@@ -129,6 +129,12 @@ export function renderLecture(lecture, accent, icon, refs, deps) {
     : { codeRef: refs };
   const { codeRef, companionRef, companionOf, badge } = linkRefs;
 
+  // Find and extract the summary part
+  const summaryPartIdx = lecture.parts.findIndex(p =>
+    p.type === 'summary' && !/checklist|قائمة فحص|قائمة المراجعة/i.test(p.title || ''),
+  );
+  const summaryPart = summaryPartIdx >= 0 ? lecture.parts[summaryPartIdx] : null;
+
   let html = `<section class="lecture mb-xl" id="${lecture.id}">
     ${renderDisclaimers(deps.config)}
     <section class="mb-xl text-center">
@@ -153,14 +159,13 @@ export function renderLecture(lecture, accent, icon, refs, deps) {
     html += `</div>`;
   }
 
-  const summaryPartIdx = lecture.parts.findIndex(p =>
-    p.type === 'summary' && !/checklist|قائمة فحص|قائمة المراجعة/i.test(p.title || ''),
-  );
-  if (summaryPartIdx >= 0) {
-    html += `<div class="lg:hidden flex justify-center mb-md">
-      <button type="button" data-jump-summary class="inline-flex items-center gap-sm px-lg py-md bg-primary text-on-primary rounded-full font-label-md font-bold hover:opacity-90 transition-opacity">
-        ${ms('summarize', false, 'text-lg')} الملخص المنظم
-      </button>
+  // Add "بديل سريع" button if summary exists
+  if (summaryPart) {
+    const summaryId = `${lecture.id}-p${summaryPartIdx + 1}`;
+    html += `<div class="flex justify-center mb-md">
+      <a href="#${esc(summaryId)}" class="inline-flex items-center gap-sm px-lg py-md bg-secondary text-on-secondary rounded-full font-label-md font-bold hover:opacity-90 transition-opacity">
+        ${ms('speed', false, 'text-lg')} بديل سريع في حال ما كنت ملحق
+      </a>
     </div>`;
   }
 
@@ -176,8 +181,15 @@ export function renderLecture(lecture, accent, icon, refs, deps) {
 
   lecture.parts.forEach((part, pi) => {
     if (isChecklistPart(part)) return;
+    // Skip summary part here; we'll render it at the end
+    if (summaryPart && part === summaryPart) return;
     html += renderPartSection(part, pi, lecture.id, deps);
   });
+
+  // Render summary part at the end if it exists
+  if (summaryPart) {
+    html += renderPartSection(summaryPart, summaryPartIdx, lecture.id, deps);
+  }
 
   if (codeRef?.id || companionRef?.id || companionOf?.id) {
     html += `<div class="mt-2xl pt-xl border-t border-outline-variant text-center flex flex-wrap justify-center gap-md">`;
