@@ -67,6 +67,20 @@
       "icon": "📖",
       "matIcon": "menu_book",
       "badge": "المحاضرة ٦"
+    },
+    {
+      "path": "par8.md",
+      "num": 8,
+      "icon": "📝",
+      "matIcon": "description",
+      "badge": "المحاضرة ٨"
+    },
+    {
+      "path": "par9.md",
+      "num": 9,
+      "icon": "🎯",
+      "matIcon": "quiz",
+      "badge": "المحاضرة ٩"
     }
   ],
   "lectureIcons": [
