@@ -41,6 +41,13 @@
       "badge": "المحاضرة ٣ — جزء ١"
     },
     {
+      "path": "par3-sec2.md",
+      "num": 3,
+      "icon": "📝",
+      "matIcon": "description",
+      "badge": "المحاضرة ٣ — جزء ٢"
+    },
+    {
       "path": "par4.md",
       "num": 4,
       "icon": "📝",
