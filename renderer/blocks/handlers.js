@@ -546,10 +546,10 @@ export function createDefaultBlockHandlers(extraHandlers = []) {
   { id: 'line-explain', match: b => b.type === 'line-explain', render: b => renderLineExplain(b.items, b.title, b.groups) },
   { id: 'line-explain-table', match: b => b.type === 'line-explain-table', render: b => renderLineExplainTable(b.header, b.rows, b.title, b.items) },
   { id: 'ol', match: b => b.type === 'ol', render: b =>
-    '<ol class="list-decimal mr-lg mb-lg space-y-xs font-body-md text-on-surface-variant">' +
+    '<ol class="list-decimal mr-lg mb-md space-y-xs font-body-md text-on-surface-variant">' +
     b.items.map(it => `<li>${inlineMd(it)}</li>`).join('') + '</ol>' },
   { id: 'ul', match: b => b.type === 'ul', render: b =>
-    '<ul class="list-disc mr-lg mb-lg space-y-xs font-body-md text-on-surface-variant">' +
+    '<ul class="list-disc mr-lg mb-md space-y-xs font-body-md text-on-surface-variant">' +
     b.items.map(it => `<li>${inlineMd(it)}</li>`).join('') + '</ul>' },
   { id: 'table', match: b => b.type === 'table', render: b => renderTable(b.header, b.rows) },
   { id: 'callout', match: b => b.type === 'callout', render: b => calloutHtml(b.cls, b.label, b.content) },
@@ -651,7 +651,7 @@ export function renderH4(block, ctx, blocks, index) {
   if (isDiagramNodesHeading(block.text)) {
     html += diagramSpecNoteHtml();
   }
-  html += `<div class="flex items-center gap-sm mb-sm mt-md">
+  html += `<div class="mini-heading flex items-center gap-sm">
     ${ms(miniHeadIcon(block.text), false, 'text-primary text-lg')}
     <h5 class="font-label-md text-label-md font-bold text-on-surface-variant">${inlineMd(block.text)}</h5>
   </div>`;

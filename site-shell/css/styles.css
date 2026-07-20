@@ -837,22 +837,51 @@ body {
 
 .prose-content h1 { font-size: 2rem !important; margin-bottom: 1.5rem; margin-top: 2rem; }
 .prose-content h2 { font-size: 1.6rem !important; margin-bottom: 1.25rem; margin-top: 1.75rem; }
-.prose-content h3 { font-size: 1.3rem !important; margin-bottom: 1rem; margin-top: 1.5rem; }
-.prose-content h4 { font-size: 1.1rem !important; margin-bottom: 0.75rem; margin-top: 1.25rem; }
-.prose-content h5 { font-size: 1rem !important; margin-bottom: 0.75rem; }
-.prose-content h6 { font-size: 0.95rem !important; margin-bottom: 0.75rem; }
+.prose-content h3 { font-size: 1.3rem !important; margin-bottom: 0.35rem; margin-top: 1.35rem; }
+.prose-content h4 { font-size: 1.1rem !important; margin-bottom: 0.25rem !important; margin-top: 1.5rem; }
+.prose-content h5 { font-size: 1rem !important; margin-bottom: 0.2rem !important; margin-top: 1.5rem; }
+.prose-content h6 { font-size: 0.95rem !important; margin-bottom: 0.15rem !important; margin-top: 1.5rem; }
 
 .prose-content ul, .prose-content ol {
-  margin: 1.5rem 1.5rem 1.5rem 0;
+  margin: 0 1.25rem 0.85rem 0;
   font-size: 16px !important;
-  line-height: 1.85 !important;
-  padding-right: 1.5rem;
+  line-height: 1.75 !important;
+  padding-right: 1.25rem;
+  padding-top: 0;
 }
 
 .prose-content li {
   font-size: 16px !important;
-  margin-bottom: 0.6rem;
-  line-height: 1.85 !important;
+  margin-bottom: 0.25rem;
+  line-height: 1.75 !important;
+}
+
+/*
+  Mini subheads (الشرح / الملخص السريع / …):
+  — larger gap ABOVE (separate from previous block)
+  — almost no gap BELOW (list belongs to this heading)
+*/
+.prose-content .mini-heading {
+  margin-top: 1.5rem !important;
+  margin-bottom: 0 !important;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.prose-content .mini-heading:first-child {
+  margin-top: 0.65rem !important;
+}
+
+.prose-content .mini-heading + :is(ul, ol, p),
+.prose-content :is(h4, h5, h6) + :is(ul, ol),
+.prose-content div:has(> :is(h4, h5, h6)) + :is(ul, ol, p) {
+  margin-top: 0.15rem !important;
+  padding-top: 0 !important;
+}
+
+.prose-content div:has(> :is(h4, h5, h6)):not(.mini-heading) {
+  margin-top: 1.35rem !important;
+  margin-bottom: 0 !important;
 }
 
 .prose-content ul ul, .prose-content ol ul {
@@ -4418,7 +4447,19 @@ body.laser-pointer-enabled button {
 
   #content .prose-content ul,
   #content .prose-content ol {
-    margin: 0.35rem 1rem 0.75rem 0;
+    margin-top: 0;
+    margin-bottom: 0.55rem;
+    margin-inline-start: 0;
+    margin-inline-end: 1rem;
+  }
+
+  #content .prose-content .mini-heading {
+    margin-top: 1.35rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  #content .prose-content .mini-heading + :is(ul, ol, p) {
+    margin-top: 0.1rem !important;
   }
 
   #content .section-block.mb-xl {
