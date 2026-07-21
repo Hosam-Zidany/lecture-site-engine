@@ -31,7 +31,7 @@ export const DEFAULT_CONFIG = {
     { re: /^(?:📌\s*)?الدرس المستفاد:/, cls: 'callout-lesson', label: 'الدرس المستفاد' },
   ],
 
-  arabicKey: { أ: 'a', ا: 'a', ب: 'b', ج: 'c', د: 'd', a: 'a', b: 'b', c: 'c', d: 'd' },
+  arabicKey: { أ: 'a', ا: 'a', ب: 'b', ج: 'c', د: 'd', ه: 'e', a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' },
 
   codeLangAliases: {
     kotlin: 'kotlin',
