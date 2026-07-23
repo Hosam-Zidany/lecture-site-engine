@@ -4,8 +4,8 @@
     "subjectNameEn": "Project Management",
     "year": "2025-2026",
     "academicYear": 5,
-    "theme": "amber-default",
-    "enbaledLectures":true,
+    "theme": "software-purple",
+    "enabledLectures": true,
     "department": "القسم النظري والعملي"
   },
   "title": "إدارة المشاريع — Project Management",
