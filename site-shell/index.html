@@ -36,7 +36,10 @@
         y=l.getElementsByTagName(r)[0];
         y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "xim6tigbcd");
-    </script>
+  </script>
+  <meta name="analytics-provider" content="posthog+clarity">
+  <meta name="posthog-key" content="__POSTHOG_KEY__">
+  <meta name="posthog-host" content="__POSTHOG_HOST__">
 </head>
 <body class="bg-background text-on-surface scroll-smooth">
     <header class="site-navbar bg-surface border-b border-outline-variant w-full px-md md:px-lg sticky top-0 z-50">
@@ -57,6 +60,9 @@
         <a class="site-navbar__link" href="../../index.html">السنوات الدراسية</a>
       </nav>
       <div class="site-navbar__actions">
+        <button type="button" id="expandOriginalBtn" class="site-navbar__toggle expand-original-btn hidden p-base rounded-full hover:bg-surface-variant transition-all" aria-label="عرض النص الأصلي في البداية" aria-pressed="false" title="عرض النص الأصلي في البداية">
+          <span class="material-symbols-outlined text-on-surface-variant" aria-hidden="true">record_voice_over</span>
+        </button>
         <div class="lecture-width-control hidden" id="lectureWidthControl">
           <button type="button" id="lectureWidthBtn" class="site-navbar__toggle p-base rounded-full hover:bg-surface-variant transition-all" aria-label="عرض المحتوى" aria-haspopup="true" aria-expanded="false" title="عرض المحتوى">
             <span class="material-symbols-outlined text-on-surface-variant" aria-hidden="true">width</span>
@@ -147,23 +153,36 @@
           </button>
           <span class="lecture-sidebar__head-label">فهرس المحاضرة</span>
         </div>
-        <div id="sidebarCourse" class="p-lg flex flex-col items-center border-b border-outline-variant shrink-0">
-          <span class="material-symbols-outlined text-primary scale-150 mb-md" id="sidebarMatIcon">school</span>
-          <h3 class="font-headline-sm text-headline-sm text-primary text-center" id="sidebarCourseTitle">...</h3>
-          <p class="font-label-md text-label-md text-on-surface-variant text-center" id="sidebarCourseSub">...</p>
-          <button type="button" id="sidebarCompleteBtn" class="lecture-complete-toggle hidden mt-md" aria-pressed="false">
-            <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
-            <span data-complete-label>وضع كمكتملة</span>
+        <div id="sidebarCourse" class="lecture-sidebar__course shrink-0">
+          <button type="button" id="sidebarPrevLectureBtn" class="lecture-sidebar__nav-arrow" aria-label="المحاضرة السابقة" title="المحاضرة السابقة">
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
           </button>
+          <span class="material-symbols-outlined lecture-sidebar__course-icon" id="sidebarMatIcon" hidden>school</span>
+          <div class="lecture-sidebar__course-text">
+            <h3 class="lecture-sidebar__course-title" id="sidebarCourseTitle">...</h3>
+            <p class="lecture-sidebar__course-sub" id="sidebarCourseSub">...</p>
+          </div>
+          <button type="button" id="sidebarNextLectureBtn" class="lecture-sidebar__nav-arrow" aria-label="المحاضرة التالية" title="المحاضرة التالية">
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+          </button>
+          <button type="button" id="sidebarCompleteBtn" class="lecture-complete-toggle hidden" aria-pressed="false" title="وضع كمكتملة">
+            <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
+            <span class="sr-only" data-complete-label>وضع كمكتملة</span>
+          </button>
+        </div>
+        <div class="lecture-sidebar__progress shrink-0" id="sidebarProgressWrap">
+          <div class="lecture-sidebar__progress-row">
+            <span class="lecture-sidebar__progress-label">التقدم بالشرح</span>
+            <span class="lecture-sidebar__progress-pct" id="sidebarProgressPct">0%</span>
+          </div>
+          <div class="lecture-sidebar__progress-track">
+            <div class="lecture-sidebar__progress-fill" id="sidebarProgressFill"></div>
+          </div>
         </div>
         <nav id="sidebarToc" class="flex-1 py-md overflow-y-auto"></nav>
         <div class="p-lg border-t border-outline-variant shrink-0">
           <button type="button" id="jumpQuizBtn" class="w-full bg-primary text-on-primary py-md rounded-lg font-bold hover:opacity-90 transition-all font-label-md">الملخص المنظم</button>
         </div>
-      </div>
-      <div class="lecture-sidebar__rail" aria-hidden="true">
-        <div class="lecture-sidebar__rail-fill" id="sidebarProgressFill"></div>
-        <div class="lecture-sidebar__rail-dot" id="sidebarProgressDot"></div>
       </div>
     </aside>
     <button type="button" id="sidebarExpandBtn" class="lecture-sidebar__expand hidden" aria-label="عرض الفهرس">
@@ -187,14 +206,29 @@
       </button>
     </div>
     <div id="mobileTocCourse" class="mobile-toc-drawer__course">
-      <span class="material-symbols-outlined text-primary" id="mobileTocMatIcon">school</span>
-      <div>
+      <button type="button" id="mobilePrevLectureBtn" class="lecture-sidebar__nav-arrow" aria-label="المحاضرة السابقة" title="المحاضرة السابقة">
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+      </button>
+      <span class="material-symbols-outlined text-primary" id="mobileTocMatIcon" hidden>school</span>
+      <div class="lecture-sidebar__course-text">
         <p class="font-label-md font-bold text-on-surface" id="mobileTocCourseTitle">...</p>
         <p class="font-label-md text-on-surface-variant text-sm" id="mobileTocCourseSub"></p>
-        <button type="button" id="mobileCompleteBtn" class="lecture-complete-toggle hidden mt-sm" aria-pressed="false">
-          <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
-          <span data-complete-label>وضع كمكتملة</span>
-        </button>
+      </div>
+      <button type="button" id="mobileNextLectureBtn" class="lecture-sidebar__nav-arrow" aria-label="المحاضرة التالية" title="المحاضرة التالية">
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+      </button>
+      <button type="button" id="mobileCompleteBtn" class="lecture-complete-toggle hidden" aria-pressed="false" title="وضع كمكتملة">
+        <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
+        <span class="sr-only" data-complete-label>وضع كمكتملة</span>
+      </button>
+    </div>
+    <div class="lecture-sidebar__progress" id="mobileProgressWrap">
+      <div class="lecture-sidebar__progress-row">
+        <span class="lecture-sidebar__progress-label">التقدم بالشرح</span>
+        <span class="lecture-sidebar__progress-pct" id="mobileProgressPct">0%</span>
+      </div>
+      <div class="lecture-sidebar__progress-track">
+        <div class="lecture-sidebar__progress-fill" id="mobileProgressFill"></div>
       </div>
     </div>
     <nav id="mobileTocNav" class="mobile-toc-drawer__nav"></nav>
@@ -240,5 +274,6 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
   <script type="module" src="js/app.js"></script>
+
 </body>
 </html>

@@ -287,6 +287,22 @@ body {
   border-color: var(--color-primary);
 }
 
+/* داخل صف عنوان المحاضرة بالفهرس (ديسكتوب وموبايل) — زر أيقونة صغير بدل المستطيل الطويل، مشان يبقى
+   مكان لاسم المحاضرة. بطاقات المحاضرات بالصفحة الرئيسية (.lecture-complete-btn) تحتفظ بشكلها الأصلي. */
+.lecture-sidebar__course .lecture-complete-toggle,
+.mobile-toc-drawer__course .lecture-complete-toggle {
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border-radius: 0.5rem;
+}
+
+.lecture-sidebar__course .lecture-complete-toggle .material-symbols-outlined,
+.mobile-toc-drawer__course .lecture-complete-toggle .material-symbols-outlined {
+  font-size: 1.05rem;
+}
+
 .dark .subject-progress-card {
   background: linear-gradient(150deg, color-mix(in srgb, var(--color-primary) 18%, var(--dm-elevated)) 0%, var(--dm-elevated) 74%);
   border-color: var(--dm-border);
@@ -477,7 +493,7 @@ body {
 
 .toc-nav-link.active,
 .toc-nav-link.bg-primary-container {
-  background: var(--color-primary-container) !important;
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface-container-low)) !important;
   border-left: 3px solid var(--color-primary);
   padding-left: 9px;
   font-weight: 600;
@@ -2278,19 +2294,23 @@ html.is-lecture-view .site-navbar__actions {
   gap: 0.125rem;
 }
 
-.site-navbar__toggle.is-active {
+.site-navbar__toggle.is-active,
+.site-navbar__toggle[aria-pressed="true"] {
   background: color-mix(in srgb, var(--color-primary) 18%, var(--color-surface-variant));
 }
 
-.site-navbar__toggle.is-active .material-symbols-outlined {
+.site-navbar__toggle.is-active .material-symbols-outlined,
+.site-navbar__toggle[aria-pressed="true"] .material-symbols-outlined {
   color: var(--color-primary);
 }
 
-.dark .site-navbar__toggle.is-active {
+.dark .site-navbar__toggle.is-active,
+.dark .site-navbar__toggle[aria-pressed="true"] {
   background: color-mix(in srgb, var(--color-primary) 24%, var(--dm-elevated-2));
 }
 
-.dark .site-navbar__toggle.is-active .material-symbols-outlined {
+.dark .site-navbar__toggle.is-active .material-symbols-outlined,
+.dark .site-navbar__toggle[aria-pressed="true"] .material-symbols-outlined {
   color: var(--color-inverse-primary, #f8fafc);
 }
 
@@ -2525,6 +2545,163 @@ body.laser-pointer-enabled button {
 
 .dark .source-quote__body p {
   color: var(--dm-text);
+}
+
+/* Original text at top of topic (toggle mode) */
+#content.expand-original-mode .original-text-collapsible {
+  border-right: 3px solid var(--color-secondary);
+  background: color-mix(in srgb, var(--color-secondary-fixed) 30%, var(--color-surface-container-lowest));
+}
+
+#content.expand-original-mode .original-text-collapsible summary {
+  pointer-events: none;
+  cursor: default;
+  padding: 0.5rem 0.875rem;
+  border-bottom: 1px dashed color-mix(in srgb, var(--color-secondary) 18%, transparent);
+}
+
+#content.expand-original-mode .original-text-collapsible summary .acc-chevron {
+  display: none;
+}
+
+#content.expand-original-mode .original-text-collapsible summary .acc-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
+#content.expand-original-mode .original-text-collapsible .acc-body {
+  border-top: none;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.original-text-collapsible .acc-body {
+  padding-bottom: 0.5rem !important;
+}
+
+.original-text-collapsible .acc-body.prose-content blockquote {
+  margin: 0 0 0.2rem 0 !important;
+}
+
+.original-text-collapsible .acc-body > :last-child {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.dark #content.expand-original-mode .original-text-collapsible {
+  border-right-color: var(--color-secondary-accent);
+  background: color-mix(in srgb, var(--color-secondary) 8%, var(--dm-elevated));
+}
+
+.dark #content.expand-original-mode .original-text-collapsible summary {
+  border-bottom-color: color-mix(in srgb, var(--color-secondary-accent) 15%, transparent);
+}
+
+.dark #content.expand-original-mode .original-text-collapsible summary .acc-title {
+  color: var(--color-secondary-accent);
+}
+
+/* Tight spacing: quote → coverage hint */
+.original-text-collapsible .acc-body blockquote {
+  margin-bottom: 0.2rem !important;
+}
+
+.original-text-collapsible .acc-body blockquote ~ p,
+.original-text-collapsible .acc-body blockquote ~ ul,
+.original-text-collapsible .acc-body blockquote ~ ol {
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: var(--color-on-surface-variant);
+  opacity: 0.75;
+  margin-top: 0.1rem;
+  margin-bottom: 0;
+}
+
+.original-text-collapsible .acc-body blockquote ~ ul,
+.original-text-collapsible .acc-body blockquote ~ ol {
+  padding-right: 1rem;
+}
+
+.dark .original-text-collapsible .acc-body blockquote ~ p,
+.dark .original-text-collapsible .acc-body blockquote ~ ul,
+.dark .original-text-collapsible .acc-body blockquote ~ ol {
+  color: var(--dm-text-muted, var(--color-on-surface-variant));
+  opacity: 0.7;
+}
+
+/* Inside original text blocks, coverage notes should be tiny muted hints (no card) */
+.original-text-collapsible .acc-body .callout-note {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0.1rem 0 0 !important;
+  gap: 0.2rem !important;
+  color: var(--color-on-surface-variant) !important;
+  opacity: 0.65;
+}
+
+.original-text-collapsible .acc-body .callout-note .material-symbols-outlined {
+  display: none;
+}
+
+.original-text-collapsible .acc-body .callout-note h5,
+.original-text-collapsible .acc-body .callout-note .font-body-md,
+.original-text-collapsible .acc-body .callout-note p,
+.original-text-collapsible .acc-body .callout-note li {
+  font-size: 0.68rem !important;
+  line-height: 1.35 !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
+  color: inherit !important;
+}
+
+.original-text-collapsible .acc-body .callout-note h5 {
+  display: inline;
+}
+
+.original-text-collapsible .acc-body .callout-note .flex-1 {
+  display: inline;
+}
+
+.original-text-collapsible .acc-body .callout-note ul,
+.original-text-collapsible .acc-body .callout-note ol {
+  margin: 0.1rem 0 0 !important;
+  padding-right: 0.9rem !important;
+}
+
+.dark .original-text-collapsible .acc-body .callout-note {
+  color: var(--dm-text-muted, var(--color-on-surface-variant)) !important;
+  opacity: 0.58;
+}
+
+.expand-original-hint-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, var(--color-outline-variant));
+  background: color-mix(in srgb, var(--color-primary-container) 40%, var(--color-surface-container-low));
+  color: var(--color-on-surface-variant);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  cursor: pointer;
+  user-select: none;
+}
+
+.expand-original-hint-toggle input[type="checkbox"] {
+  width: 0.9rem;
+  height: 0.9rem;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.dark .expand-original-hint-toggle {
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--dm-border));
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--dm-elevated));
+  color: var(--dm-text-muted, var(--color-on-surface-variant));
 }
 
 /* ── Numbered code snippets ── */
@@ -4113,8 +4290,17 @@ body.laser-pointer-enabled button {
 .think-prompt__icon { color: var(--color-secondary); }
 .think-prompt__label { font-weight: 700; font-size: 0.875rem; }
 .think-prompt__body {
-  margin: 0; padding: 0.5rem 1rem 1rem; border: none; background: transparent;
-  font-size: 0.9375rem; line-height: 1.65; color: var(--color-on-surface-variant);
+  display: block;
+  margin: 0 !important;
+  padding: 0.5rem 1rem 1rem !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-on-surface-variant);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .dark .think-prompt {
@@ -4607,9 +4793,18 @@ body.laser-pointer-enabled button {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: var(--lecture-pad-sm, 0.5rem) var(--lecture-pad-default, 1.5rem);
+  padding: var(--lecture-pad-sm, 0.5rem) var(--lecture-pad-default, 1.5rem) var(--lecture-pad-sm, 0.5rem) 0.5rem;
   min-height: 2.75rem;
   border-bottom: 1px solid var(--color-outline-variant);
+}
+
+/* السهم بزاوية أقصى اليسار دايماً، وعنوان الفهرس بالطرف المقابل */
+.lecture-sidebar__head .lecture-sidebar__toggle {
+  order: 2;
+}
+
+.lecture-sidebar__head .lecture-sidebar__head-label {
+  order: 1;
 }
 
 .lecture-sidebar__head-label {
@@ -4661,50 +4856,117 @@ body.laser-pointer-enabled button {
   display: none;
 }
 
-/* شريط التقدم الرفيع على حافة الفهرس */
-.lecture-sidebar__rail {
-  position: relative;
-  width: 3px;
-  margin-inline: 0.625rem;
-  align-self: stretch;
+/* رأس المادة المضغوط أعلى الفهرس — أيقونة + عنوان/عنوان فرعي بسطر واحد، مع سهمي تنقل بين المحاضرات */
+.lecture-sidebar__course {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem var(--lecture-pad-default, 1.5rem);
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.lecture-sidebar__course-icon {
+  flex: 0 0 auto;
+  font-size: 1.25rem;
+}
+
+.lecture-sidebar__course-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lecture-sidebar__course-title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.35;
+}
+
+.lecture-sidebar__course-sub {
+  margin: 0.1rem 0 0;
+  font-size: 0.72rem;
+  color: var(--color-on-surface-variant);
+  line-height: 1.3;
+}
+
+.lecture-sidebar__nav-arrow {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  color: var(--color-on-surface-variant);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.lecture-sidebar__nav-arrow:hover:not(:disabled) {
+  background: var(--color-surface-container-high, var(--color-surface));
+  color: var(--color-primary);
+  border-color: var(--color-outline-variant);
+}
+
+.lecture-sidebar__nav-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.lecture-sidebar__nav-arrow .material-symbols-outlined {
+  font-size: 1.15rem;
+}
+
+/* شريط تقدم أفقي بسيط بدل الطابة العائمة السابقة — أوضح وأصعب ينكسر */
+.lecture-sidebar__progress {
+  padding: 0.65rem var(--lecture-pad-default, 1.5rem);
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.lecture-sidebar__progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.lecture-sidebar__progress-label {
+  font-size: 0.7rem;
+  color: var(--color-on-surface-variant);
+}
+
+.lecture-sidebar__progress-pct {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.lecture-sidebar__progress-track {
+  height: 4px;
   background: var(--color-outline-variant);
   border-radius: 999px;
-  overflow: visible;
-  pointer-events: none;
-  transition: opacity 0.18s ease;
+  overflow: hidden;
 }
 
-/* لما الفهرس مطوي، الطابة تضل موجودة بس تلتصق بحافة زر الفتح بدل ما تطفو لحالها بمسافة كبيرة */
-.lecture-sidebar.is-collapsed .lecture-sidebar__rail {
-  margin-inline: 0.375rem;
-}
-
-.lecture-sidebar__rail-fill {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: 0%;
+.lecture-sidebar__progress-fill {
+  height: 100%;
+  width: 0%;
   background: var(--color-primary);
   border-radius: 999px;
-  transition: height 0.12s linear;
+  transition: width 0.12s linear;
 }
 
-.lecture-sidebar__rail-dot {
-  position: absolute;
-  inset-inline-start: 50%;
-  top: 0%;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--color-primary);
-  border: 2px solid var(--color-surface-container-lowest);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 1px var(--color-primary-container);
-  transition: top 0.12s linear;
+/* تمييز خفيف للعنوان الرئيسي بالفهرس لما يكون أحد عناوينه الفرعية هو الفعّال حالياً */
+.toc-nav-link.is-parent-active {
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  color: var(--color-primary);
 }
 
-.dark .lecture-sidebar__rail-dot {
-  border-color: var(--color-surface);
+.dark .toc-nav-link.is-parent-active {
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
 }
 
 /* عناوين فرعية بالفهرس فيها كود مثل `Tree Search` — تنسيق أنظف بدل إظهار العلامات الفاصلة كنص خام */
